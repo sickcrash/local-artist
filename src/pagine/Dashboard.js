@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../componenti/AuthContext";
 import { useEffect, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase"
 
 function Home() {
@@ -27,6 +27,29 @@ function Home() {
     }
   };
 
+  const updateProfile = (elemento) => {
+    switch(elemento){
+      case "nickname":
+        const setNickname = async () => {
+          const retrieved = await updateDoc(doc(db, "utenti", currentUser.uid), {
+            nickname: document.getElementById("nickname").value
+          })
+          window.location.reload(false);
+        }
+        setNickname()
+        break
+        case "city":
+          const setCity = async () => {
+            const retrieved = await updateDoc(doc(db, "utenti", currentUser.uid), {
+              city: document.getElementById("city").value
+            })
+            window.location.reload(false);
+          }
+          setCity()
+          break
+    }
+  };
+
   return (
     <div>
       <div class="profile-picture">
@@ -37,14 +60,14 @@ function Home() {
       <section>
         <p>Nome d'arte</p>
         <input type="text" value={datiUtente.nickname} disabled />
-        <input type="text" placeholder="Nuovo nome" />
-        <button style={{ backgroundColor: "gray" }}>Aggiorna</button>
+        <input type="text" placeholder="Nuovo nome" id="nickname" />
+        <button style={{ backgroundColor: "gray" }} onClick={() => updateProfile("nickname")}>Aggiorna</button>
       </section>
       <section>
         <p>Città</p>
         <input type="text" value={datiUtente.city} disabled />
-        <input type="text" placeholder="Nuova città" />
-        <button style={{ backgroundColor: "gray" }}>Aggiorna</button>
+        <input type="text" placeholder="Nuova città" id="city" />
+        <button style={{ backgroundColor: "gray" }} onClick={() => updateProfile("city")}>Aggiorna</button>
       </section>
       <br />
       {currentUser && <button 
