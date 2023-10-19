@@ -12,7 +12,7 @@ function Home() {
   useEffect(() =>{
     const ottieniDati = async () => {
       const retrieved = await getDoc(doc(db, "utenti", currentUser.uid));
-      setDatiUtente(retrieved.data())
+      if(retrieved.data()) setDatiUtente(retrieved.data())
     }
     ottieniDati()
     // il retrieve avviene con successo
@@ -59,13 +59,13 @@ function Home() {
       <br />
       <section>
         <p>Nome d'arte</p>
-        <input type="text" value={datiUtente.nickname} disabled />
+        <input type="text" value={datiUtente.nickname? datiUtente.nickname : ""} disabled />
         <input type="text" placeholder="Nuovo nome" id="nickname" />
         <button style={{ backgroundColor: "gray" }} onClick={() => updateProfile("nickname")}>Aggiorna</button>
       </section>
       <section>
         <p>Città</p>
-        <input type="text" value={datiUtente.city} disabled />
+        <input type="text" value={datiUtente.city? datiUtente.city : ""} disabled />
         <input type="text" placeholder="Nuova città" id="city" />
         <button style={{ backgroundColor: "gray" }} onClick={() => updateProfile("city")}>Aggiorna</button>
       </section>
