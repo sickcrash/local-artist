@@ -24,7 +24,7 @@ function Signup() {
 
     return (
         <RedirectLoggedIn>
-            <div>
+            <div className='main'>
                 <h1>Registrazione</h1>
                 <form onSubmit={handleSignup}>
                     <label for="username">Username:</label>

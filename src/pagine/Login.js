@@ -25,7 +25,7 @@ function Login() {
 
     return (
         <RedirectLoggedIn>
-            <div>
+            <div className='main'>
                 <h1>Login</h1>
                 <form onSubmit={handleLogin}>
                     <label for="username">Email:</label>

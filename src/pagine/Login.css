@@ -1,10 +1,17 @@
-div {
+.main {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   height: 90vh;
   margin: 0;
+}
+
+div {
+  display: flex;
+  justify-content: top;
+  align-items: center;
+  flex-direction: column;
 }
 
 section{

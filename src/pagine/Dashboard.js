@@ -51,7 +51,7 @@ function Home() {
   };
 
   return (
-    <div>
+    <div className="main">
       <div class="profile-picture">
         <img src="https://picsum.photos/200" alt="Foto Profilo" />
       </div>
