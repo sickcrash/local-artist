@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../componenti/AuthContext";
 import './Home.css';
 
 function Home() {
   const { currentUser, logout } = useAuth();
-  const { categoria, setCategoria } = useState("")
-  const { primoLivello, setPrimoLivello } = useState("")
-  const { secondoLivello, setSecondoLivello } = useState("")
+  const [categoria, setCategoria] = useState("")
+  const [primoLivello, setPrimoLivello] = useState("")
+  const [secondoLivello, setSecondoLivello] = useState("")
 
   const categorie = {
     "Musica": {
@@ -35,24 +35,65 @@ function Home() {
       <p>Mettiti in contatto con altri artisti con i tuoi stessi interessi:
         scambia opinioni e inizia nuove collaborazioni.
       </p>
-      <h2>Cerca:</h2>
-      <div style={{ height: "auto", overflowY: "auto" }}>
-        <div style={{ flexDirection: "row", width: "80%", flexWrap: "wrap", gap: "1vw", justifyContent: "center", marginBottom: "1vw" }}>
-          {Object.keys(categorie).map((categoria) => (
-            <button style={{ backgroundColor: "#7F0799" }}>{categoria}</button>
-          ))}
+      {secondoLivello ?
+        <div>
+          <h2>Le tue preferenze: {categoria}, {primoLivello}, {secondoLivello}</h2>
+          <button style={{ backgroundColor: "green"}} onClick={() => setSecondoLivello("")}>
+            ripristina
+          </button>
         </div>
-        {categoria ? <div style={{ flexDirection: "row", width: "80%", flexWrap: "wrap", gap: "1vw", justifyContent: "center", marginBottom: "1vw" }}>
-          {categorie["Design"].livello1.map((sottocategoria) => (
-            <button style={{ backgroundColor: "#9649CB" }}>{sottocategoria}</button>
-          ))}
-        </div> : null}
-        {primoLivello ? <div style={{ flexDirection: "row", width: "80%", flexWrap: "wrap", gap: "1vw", justifyContent: "center", marginBottom: "1vw" }}>
-          {categorie["Design"].livello2.map((sottocategoria) => (
-            <button style={{ backgroundColor: "#0C7489" }}>{sottocategoria}</button>
-          ))}
-        </div> : null}
-      </div>
+        : null}
+      {secondoLivello ? null :
+        <div><h2>Imposta preferenze:</h2>
+          <div style={{ height: "auto", overflowY: "auto" }}>
+            <div style={{ flexDirection: "row", width: "100%", flexWrap: "wrap", gap: "1vw", justifyContent: "center", marginBottom: "1vw" }}>
+              {Object.keys(categorie).map((singolaCategoria) => (
+                <div>
+                  {categoria == singolaCategoria ?
+                    <button style={{ backgroundColor: "#7F0799", border: "3px solid black" }}>
+                      {singolaCategoria}
+                    </button>
+                    :
+                    <button style={{ backgroundColor: "#7F0799" }}
+                      onClick={() => { setCategoria(singolaCategoria); setPrimoLivello(""); setSecondoLivello("") }}>
+                      {singolaCategoria}
+                    </button>
+                  }
+                </div>
+              ))}
+            </div>
+            {categoria ? <div style={{ flexDirection: "row", width: "100%", flexWrap: "wrap", gap: "1vw", justifyContent: "center", marginBottom: "1vw" }}>
+              {categorie[categoria].livello1.map((sottocategoria) => (
+                <div>
+                  {primoLivello == sottocategoria ?
+                    <button style={{ backgroundColor: "#9649CB", border: "3px solid black" }}>
+                      {sottocategoria}
+                    </button>
+                    :
+                    <button style={{ backgroundColor: "#9649CB" }} onClick={() => setPrimoLivello(sottocategoria)}>
+                      {sottocategoria}
+                    </button>
+                  }
+                </div>
+              ))}
+            </div> : null}
+            {primoLivello ? <div style={{ flexDirection: "row", width: "100%", flexWrap: "wrap", gap: "1vw", justifyContent: "center", marginBottom: "1vw" }}>
+              {categorie[categoria].livello2.map((sottocategoria) => (
+                <div>
+                  {secondoLivello == sottocategoria ?
+                    <button style={{ backgroundColor: "#0C7489", border: "3px solid black" }}>
+                      {sottocategoria}
+                    </button>
+                    :
+                    <button style={{ backgroundColor: "#0C7489" }} onClick={() => setSecondoLivello(sottocategoria)}>
+                      {sottocategoria}
+                    </button>
+                  }
+                </div>
+              ))}
+            </div> : null}
+          </div>
+        </div>}
     </div>
   );
 }
