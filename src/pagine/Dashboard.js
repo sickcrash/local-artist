@@ -9,14 +9,14 @@ function Home() {
   const navigate = useNavigate()
   const [datiUtente, setDatiUtente] = useState("")
 
-  useEffect(() =>{
+  useEffect(() => {
     const ottieniDati = async () => {
       const retrieved = await getDoc(doc(db, "utenti", currentUser.uid));
-      if(retrieved.data()) setDatiUtente(retrieved.data())
+      if (retrieved.data()) setDatiUtente(retrieved.data())
     }
     ottieniDati()
     // il retrieve avviene con successo
-  },[])
+  }, [])
 
   const handleLogout = async (e) => {
     try {
@@ -28,7 +28,7 @@ function Home() {
   };
 
   const updateProfile = (elemento) => {
-    switch(elemento){
+    switch (elemento) {
       case "nickname":
         const setNickname = async () => {
           const retrieved = await updateDoc(doc(db, "utenti", currentUser.uid), {
@@ -36,19 +36,25 @@ function Home() {
           })
           window.location.reload(false);
         }
-        setNickname()
+        const setPersonalField = async () => {
+          await setDoc(doc(db, "utenti", currentUser.uid), {
+            nickname: "",
+            city: ""
+          })
+        }
+        setNickname().catch((error) => setPersonalField())
         break
-        case "city":
-          const setCity = async () => {
-            const retrieved = await updateDoc(doc(db, "utenti", currentUser.uid), {
-              city: document.getElementById("city").value
-            })
-            window.location.reload(false);
-          }
-          setCity()
-          break
+      case "city":
+        const setCity = async () => {
+          const retrieved = await updateDoc(doc(db, "utenti", currentUser.uid), {
+            city: document.getElementById("city").value
+          })
+          window.location.reload(false);
+        }
+        setCity()
+        break
     }
-  };
+  }
 
   return (
     <div className="main">
@@ -59,20 +65,20 @@ function Home() {
       <br />
       <section>
         <p>Nome d'arte</p>
-        <input type="text" value={datiUtente.nickname? datiUtente.nickname : ""} disabled />
+        <input type="text" value={datiUtente.nickname ? datiUtente.nickname : ""} disabled />
         <input type="text" placeholder="Nuovo nome" id="nickname" />
         <button style={{ backgroundColor: "gray" }} onClick={() => updateProfile("nickname")}>Aggiorna</button>
       </section>
       <section>
         <p>Città</p>
-        <input type="text" value={datiUtente.city? datiUtente.city : ""} disabled />
+        <input type="text" value={datiUtente.city ? datiUtente.city : ""} disabled />
         <input type="text" placeholder="Nuova città" id="city" />
         <button style={{ backgroundColor: "gray" }} onClick={() => updateProfile("city")}>Aggiorna</button>
       </section>
       <br />
-      {currentUser && <button 
+      {currentUser && <button
         onClick={handleLogout}
-        style={{paddingInline:"5vw"}}>Esci</button>}
+        style={{ paddingInline: "5vw" }}>Esci</button>}
     </div>
   );
 }

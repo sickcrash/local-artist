@@ -3,9 +3,11 @@ import './Login.css';
 import RedirectLoggedIn from '../componenti/RedirectLoggedIn';
 import { useAuth } from '../componenti/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { doc, setDoc } from "firebase/firestore";
+import { db } from '../firebase';
 
 function Signup() {
-    const { signup } = useAuth();
+    const { currentUser, signup } = useAuth();
     const navigate = useNavigate()
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -15,7 +17,7 @@ function Signup() {
         e.preventDefault();
         try {
             await signup(email, password);
-            navigate("/login")
+            navigate("/dashboard")
         } catch (error) {
             console.error('Registration failed:', error.message);
             setError(error.message)
