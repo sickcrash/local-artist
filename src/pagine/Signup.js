@@ -16,7 +16,7 @@ function Signup() {
     const handleSignup = async (e) => {
         e.preventDefault();
         try {
-            await signup(email, password);
+            await signup(email, password)
             navigate("/dashboard")
         } catch (error) {
             console.error('Registration failed:', error.message);
@@ -40,7 +40,7 @@ function Signup() {
                     <button type="submit">Registrati</button>
                 </form>
                 <p>Hai già un account? <a href="/Login">Effettua il login</a></p>
-                <p style={{color:"red"}}>{error}</p>
+                <p style={{ color: "red" }}>{error}</p>
             </div>
         </RedirectLoggedIn>
     );

@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../componenti/AuthContext";
 import './Home.css';
 import { useNavigate } from "react-router-dom";
+import setPersonalField from "./Dashboard.js"
+import { db } from "../firebase.js";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 
 function Home() {
   const navigate = useNavigate();
@@ -9,6 +12,7 @@ function Home() {
   const [categoria, setCategoria] = useState("")
   const [primoLivello, setPrimoLivello] = useState("")
   const [secondoLivello, setSecondoLivello] = useState("")
+  const [loading, setLoading] = useState(true)
 
   const categorie = {
     "Musica": {
@@ -31,6 +35,39 @@ function Home() {
     }
   }
 
+  useEffect(() => {
+    if (currentUser) {
+      const ottieniDati = async () => {
+        const retrieved = await getDoc(doc(db, "preferenze_utenti", currentUser.uid));
+        if (retrieved.data()) {
+          setCategoria(retrieved.data()["preferenze"]["categoria"])
+          setPrimoLivello(retrieved.data()["preferenze"]["primoLivello"])
+          setSecondoLivello(retrieved.data()["preferenze"]["secondoLivello"])
+        }
+      }
+      ottieniDati()
+      setLoading(false)
+    }
+  }, [])
+
+  const setPreferenze = () => {
+    const updatePreferenze = async () => {
+      await updateDoc(doc(db, "preferenze_utenti", currentUser.uid), {
+        preferenze: { categoria, primoLivello, secondoLivello }
+      })
+    }
+    const setPersonalField = async () => {
+      await setDoc(doc(db, "preferenze_utenti", currentUser.uid), {
+        preferenze: { categoria, primoLivello, secondoLivello }
+      })
+    }
+    updatePreferenze().catch((error) => setPersonalField()).then(() => updatePreferenze())
+  }
+
+  useEffect(() => {
+    if (!loading && currentUser) setPreferenze()
+  }, [secondoLivello])
+
   return (
     <div className="main" >
       <h1>LocalTalentHub: scopri chi condivide le tue passioni nella tua stessa città</h1>
@@ -40,7 +77,7 @@ function Home() {
       {secondoLivello ?
         <div>
           <h2>Le tue preferenze: {categoria}, {primoLivello}, {secondoLivello}</h2>
-          <button style={{ backgroundColor: "green"}} onClick={() => setSecondoLivello("")}>
+          <button style={{ backgroundColor: "green" }} onClick={() => setSecondoLivello("")}>
             ripristina
           </button>
         </div>
@@ -57,14 +94,14 @@ function Home() {
                     </button>
                     :
                     <button style={{ backgroundColor: "#7F0799" }}
-                      onClick={() => { 
-                        if(currentUser){
+                      onClick={() => {
+                        if (currentUser) {
                           setCategoria(singolaCategoria);
                           setPrimoLivello("");
                           setSecondoLivello("")
                         }
                         else navigate("/login")
-                       }}>
+                      }}>
                       {singolaCategoria}
                     </button>
                   }
@@ -94,7 +131,10 @@ function Home() {
                       {sottocategoria}
                     </button>
                     :
-                    <button style={{ backgroundColor: "#0C7489" }} onClick={() => setSecondoLivello(sottocategoria)}>
+                    <button style={{ backgroundColor: "#0C7489" }} onClick={() => {
+                      setSecondoLivello(sottocategoria)
+                    }
+                    }>
                       {sottocategoria}
                     </button>
                   }

@@ -27,22 +27,24 @@ function Home() {
     }
   };
 
+  const setPersonalField = async () => {
+    await setDoc(doc(db, "utenti", currentUser.uid), {
+      nickname: "",
+      city: "",
+      preferenze: ""
+    })
+  }
+  
   const updateProfile = (elemento) => {
     switch (elemento) {
       case "nickname":
         const setNickname = async () => {
-          const retrieved = await updateDoc(doc(db, "utenti", currentUser.uid), {
+          await updateDoc(doc(db, "utenti", currentUser.uid), {
             nickname: document.getElementById("nickname").value
           })
           window.location.reload(false);
         }
-        const setPersonalField = async () => {
-          await setDoc(doc(db, "utenti", currentUser.uid), {
-            nickname: "",
-            city: ""
-          })
-        }
-        setNickname().catch((error) => setPersonalField())
+        setNickname().catch((error) => setPersonalField()).then(() => setNickname())
         break
       case "city":
         const setCity = async () => {
@@ -51,7 +53,7 @@ function Home() {
           })
           window.location.reload(false);
         }
-        setCity()
+        setCity().catch((error) => setPersonalField())
         break
     }
   }
