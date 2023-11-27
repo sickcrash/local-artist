@@ -64,12 +64,15 @@ function Home() {
     updatePreferenze().catch((error) => setPersonalField()).then(() => updatePreferenze())
   }
 
+  const cercaMatch = () => {
+  }
+
   useEffect(() => {
     if (!loading && currentUser) setPreferenze()
   }, [secondoLivello])
 
   return (
-    <div className="main" >
+    <div className="main" style={{ overflowY: "scroll" }} >
       <h1>LocalTalentHub: scopri chi condivide le tue passioni nella tua stessa città</h1>
       <p>Mettiti in contatto con altri artisti con i tuoi stessi interessi:
         scambia opinioni e inizia nuove collaborazioni.
@@ -77,9 +80,14 @@ function Home() {
       {secondoLivello ?
         <div>
           <h2>Le tue preferenze: {categoria}, {primoLivello}, {secondoLivello}</h2>
-          <button style={{ backgroundColor: "green" }} onClick={() => setSecondoLivello("")}>
-            ripristina
-          </button>
+          <div style={{ width: "100%", flexDirection: "row", gap: "1vw" }}>
+            <button style={{ backgroundColor: "green" }} onClick={() => cercaMatch()}>
+              <ion-icon name="color-wand-outline"></ion-icon> cerca match
+            </button>
+            <button style={{ backgroundColor: "grey" }} onClick={() => { setCategoria(""); setPrimoLivello(""); setSecondoLivello("") }}>
+              <ion-icon name="shuffle-outline"></ion-icon>cambia preferenze
+            </button>
+          </div>
         </div>
         : null}
       {secondoLivello ? null :
@@ -143,6 +151,40 @@ function Home() {
             </div> : null}
           </div>
         </div>}
+      <br />
+      <div style={{flexDirection:"row", flexWrap:"wrap", gap:"2vw", width:"80%", justifyContent:"center"}}>
+        <div class="user-info-window">
+          <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
+          <h2>Nome Utente</h2>
+          <p>Descrizione dell'utente</p>
+          <button class="contact-button">Contattami</button>
+        </div>
+        <div class="user-info-window">
+          <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
+          <h2>Nome Utente</h2>
+          <p>Descrizione dell'utente</p>
+          <button class="contact-button">Contattami</button>
+        </div>
+        <div class="user-info-window">
+          <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
+          <h2>Nome Utente</h2>
+          <p>Descrizione dell'utente</p>
+          <button class="contact-button">Contattami</button>
+        </div>
+        <div class="user-info-window">
+          <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
+          <h2>Nome Utente</h2>
+          <p>Descrizione dell'utente</p>
+          <button class="contact-button">Contattami</button>
+        </div>
+        <div class="user-info-window">
+          <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
+          <h2>Nome Utente</h2>
+          <p>Descrizione dell'utente</p>
+          <button class="contact-button">Contattami</button>
+        </div>
+      </div>
+      <br/><br/>
     </div>
   );
 }

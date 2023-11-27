@@ -1,6 +1,9 @@
 nav {
     background-color: #333;
     overflow: hidden;
+    border-radius: 1vw;
+    margin: 1vw;
+    border: 2px solid #f0f0f0;
 }
 
 nav a {

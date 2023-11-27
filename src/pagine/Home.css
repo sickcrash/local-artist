@@ -1,7 +1,47 @@
   button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1vw;
     width: 18vw;
     padding: 1rem;
     font-size: 1.2rem;
     cursor: pointer;
     color: white;
   }
+
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f0f0f0; /* Colore sfondo */
+}
+
+.user-info-window {
+    background-color: #ffffff; /* Colore sfondo finestra */
+    border-radius: 10px; /* Bordi arrotondati */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombra */
+    padding: 20px;
+    text-align: center;
+}
+
+.user-info-window img {
+    border-radius: 50%; /* Bordi arrotondati per l'immagine profilo */
+    max-width: 100px;
+    height: auto;
+}
+
+.contact-button {
+    background-color: #3498db; /* Colore sfondo bottone */
+    color: #ffffff; /* Colore testo bottone */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px; /* Bordi arrotondati del bottone */
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px;
+}
