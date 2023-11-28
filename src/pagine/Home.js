@@ -13,6 +13,7 @@ function Home() {
   const [primoLivello, setPrimoLivello] = useState("")
   const [secondoLivello, setSecondoLivello] = useState("")
   const [loading, setLoading] = useState(true)
+  const [isMatching, setIsMatching] = useState(false)
 
   const categorie = {
     "Musica": {
@@ -33,6 +34,11 @@ function Home() {
         "corporate", "brutalismo", "media blending", "altro"
       ]
     }
+  }
+
+  const matchingState = () => {
+    if (isMatching) setIsMatching(false)
+    else setIsMatching(true)
   }
 
   useEffect(() => {
@@ -80,14 +86,32 @@ function Home() {
       {secondoLivello ?
         <div>
           <h2>Le tue preferenze: {categoria}, {primoLivello}, {secondoLivello}</h2>
-          <div style={{ width: "100%", flexDirection: "row", gap: "1vw" }}>
-            <button style={{ backgroundColor: "green" }} onClick={() => cercaMatch()}>
-              <ion-icon name="color-wand-outline"></ion-icon> cerca match
-            </button>
-            <button style={{ backgroundColor: "grey" }} onClick={() => { setCategoria(""); setPrimoLivello(""); setSecondoLivello("") }}>
+          <div style={{ width: "100%", flexDirection: "row", gap: "1vw", justifyContent:"center"}}>
+            {isMatching ?
+              <button style={{ backgroundColor: "green", border: "3px solid black" }} onClick={() => matchingState()}>
+                <ion-icon name="color-wand-outline"></ion-icon> <b>avvia matching</b>
+              </button>
+              :
+              <button style={{ backgroundColor: "green" }} onClick={() => matchingState()}>
+                <ion-icon name="color-wand-outline"></ion-icon> <b>avvia matching</b>
+              </button>
+            }
+            <button style={{ backgroundColor: "grey" }}
+              onClick={() => { setCategoria(""); setPrimoLivello(""); setSecondoLivello("") }}>
               <ion-icon name="shuffle-outline"></ion-icon>cambia preferenze
             </button>
           </div>
+          <br />
+          {isMatching ?
+            <div style={{ width: "100%", flexDirection: "row", gap: "1vw", justifyContent:"center" }}>
+              <button style={{ backgroundColor: "orange" }} onClick={() => cercaMatch()}>
+                <ion-icon name="people-circle-outline"></ion-icon> <b>artisti <br /> simili</b>
+              </button>
+              <button style={{ backgroundColor: "salmon" }} onClick={() => { setCategoria(""); setPrimoLivello(""); setSecondoLivello("") }}>
+                <ion-icon name="people-circle"></ion-icon> <b>artisti <br /> complementari</b>
+              </button>
+            </div>
+            : null}
         </div>
         : null}
       {secondoLivello ? null :
@@ -152,39 +176,40 @@ function Home() {
           </div>
         </div>}
       <br />
-      <div style={{flexDirection:"row", flexWrap:"wrap", gap:"2vw", width:"80%", justifyContent:"center"}}>
-        <div class="user-info-window">
-          <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
-          <h2>Nome Utente</h2>
-          <p>Descrizione dell'utente</p>
-          <button class="contact-button">Contattami</button>
-        </div>
-        <div class="user-info-window">
-          <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
-          <h2>Nome Utente</h2>
-          <p>Descrizione dell'utente</p>
-          <button class="contact-button">Contattami</button>
-        </div>
-        <div class="user-info-window">
-          <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
-          <h2>Nome Utente</h2>
-          <p>Descrizione dell'utente</p>
-          <button class="contact-button">Contattami</button>
-        </div>
-        <div class="user-info-window">
-          <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
-          <h2>Nome Utente</h2>
-          <p>Descrizione dell'utente</p>
-          <button class="contact-button">Contattami</button>
-        </div>
-        <div class="user-info-window">
-          <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
-          <h2>Nome Utente</h2>
-          <p>Descrizione dell'utente</p>
-          <button class="contact-button">Contattami</button>
-        </div>
-      </div>
-      <br/><br/>
+      {currentUser ?
+        <div style={{ flexDirection: "row", flexWrap: "wrap", gap: "2vw", width: "80%", justifyContent: "center" }}>
+          <div class="user-info-window">
+            <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
+            <h2>Nome Utente</h2>
+            <p>Descrizione dell'utente</p>
+            <button class="contact-button">Contattami</button>
+          </div>
+          <div class="user-info-window">
+            <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
+            <h2>Nome Utente</h2>
+            <p>Descrizione dell'utente</p>
+            <button class="contact-button">Contattami</button>
+          </div>
+          <div class="user-info-window">
+            <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
+            <h2>Nome Utente</h2>
+            <p>Descrizione dell'utente</p>
+            <button class="contact-button">Contattami</button>
+          </div>
+          <div class="user-info-window">
+            <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
+            <h2>Nome Utente</h2>
+            <p>Descrizione dell'utente</p>
+            <button class="contact-button">Contattami</button>
+          </div>
+          <div class="user-info-window">
+            <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
+            <h2>Nome Utente</h2>
+            <p>Descrizione dell'utente</p>
+            <button class="contact-button">Contattami</button>
+          </div>
+        </div> : null}
+      <br /><br />
     </div>
   );
 }
