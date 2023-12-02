@@ -4,7 +4,7 @@ import './Home.css';
 import { useNavigate } from "react-router-dom";
 import setPersonalField from "./Dashboard.js"
 import { db } from "../firebase.js";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
 
 function Home() {
   const navigate = useNavigate();
@@ -14,6 +14,9 @@ function Home() {
   const [secondoLivello, setSecondoLivello] = useState("")
   const [loading, setLoading] = useState(true)
   const [isMatching, setIsMatching] = useState(false)
+  const [datiUtente, setDatiUtente] = useState("")
+  const [artisti, setArtisti] = useState([])
+  const [infoArtisti, setInfoArtisti] = useState([])
 
   const categorie = {
     "Musica": {
@@ -56,6 +59,20 @@ function Home() {
     }
   }, [])
 
+  useEffect(() => {
+    if (currentUser) {
+      const ottieniDati = async () => {
+        const retrieved = await getDoc(doc(db, "utenti", currentUser.uid));
+        if (retrieved.data()) setDatiUtente(retrieved.data())
+      }
+      ottieniDati()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!loading && currentUser) setPreferenze()
+  }, [secondoLivello])
+
   const setPreferenze = () => {
     const updatePreferenze = async () => {
       await updateDoc(doc(db, "preferenze_utenti", currentUser.uid), {
@@ -70,23 +87,65 @@ function Home() {
     updatePreferenze().catch((error) => setPersonalField()).then(() => updatePreferenze())
   }
 
-  const cercaMatch = () => {
+  const cercaSimili = async () => {
+    setArtisti([])
+    const retrieved = await getDocs(query(
+      collection(db, "preferenze_utenti"),
+      where("preferenze.categoria", "==", categoria),
+      where("preferenze.primoLivello", "==", primoLivello)
+    ))
+    const promises = retrieved.docs
+      .filter(miodoc => miodoc.id != currentUser.uid)
+      .map(async (miodoc) => {
+        const utenteId = miodoc.id;
+        const utenteRef = doc(db, "utenti", utenteId);
+        const utenteSnap = await getDoc(utenteRef);
+        if (utenteSnap.exists()) {
+          const utenteData = utenteSnap.data();
+          return {
+            ...miodoc.data().preferenze,
+            id: utenteId,
+            nickname: utenteData.nickname,
+            city: utenteData.city
+          };
+        }
+        return null;
+      });
+    const results = await Promise.all(promises);
+    const filteredResults = results.filter(result => result !== null);
+    console.log(filteredResults)
+    setArtisti(filteredResults)
+    document.getElementById("artistiSimili").style.border = "3px solid black"
+    document.getElementById("artistiComplementari").style.border = ""
   }
 
-  useEffect(() => {
-    if (!loading && currentUser) setPreferenze()
-  }, [secondoLivello])
+  const cercaComplementari = async () => {
+    setArtisti([])
+    const retrieved = await getDocs(query(
+      collection(db, "preferenze_utenti"),
+      where("preferenze.categoria", "==", categoria),
+      where("preferenze.secondoLivello", "==", secondoLivello)
+    ))
+    const mappatura = retrieved.docs.filter(doc => doc.id !== currentUser.uid).map((doc) => ({ ...doc.data(), id: doc.id }))
+    setArtisti(mappatura)
+    document.getElementById("artistiComplementari").style.border = "3px solid black"
+    document.getElementById("artistiSimili").style.border = ""
+  }
+
+
 
   return (
     <div className="main" style={{ overflowY: "scroll" }} >
-      <h1>LocalTalentHub: scopri chi condivide le tue passioni nella tua stessa città</h1>
+      <br />
+      <h2>LocalTalentHub: scopri chi condivide le tue passioni nella tua stessa città</h2>
       <p>Mettiti in contatto con altri artisti con i tuoi stessi interessi:
         scambia opinioni e inizia nuove collaborazioni.
       </p>
-      {secondoLivello ?
+      {secondoLivello && datiUtente.nickname && datiUtente.city && !loading ?
         <div>
-          <h2>Le tue preferenze: {categoria}, {primoLivello}, {secondoLivello}</h2>
-          <div style={{ width: "100%", flexDirection: "row", gap: "1vw", justifyContent:"center"}}>
+          <h3 style={{ margin: "0", gap: "0.5vw" }}><ion-icon name="brush"></ion-icon> Le tue preferenze: {categoria}, {primoLivello}, {secondoLivello}</h3>
+          <h3 style={{ gap: "0.5vw" }}><ion-icon name="location"></ion-icon>{datiUtente.nickname}, stai cercando presso: {datiUtente.city}</h3>
+          <div style={{ width: "100%", flexDirection: "row", gap: "1vw", justifyContent: "center" }}>
             {isMatching ?
               <button style={{ backgroundColor: "green", border: "3px solid black" }} onClick={() => matchingState()}>
                 <ion-icon name="color-wand-outline"></ion-icon> <b>avvia matching</b>
@@ -103,23 +162,33 @@ function Home() {
           </div>
           <br />
           {isMatching ?
-            <div style={{ width: "100%", flexDirection: "row", gap: "1vw", justifyContent:"center" }}>
-              <button style={{ backgroundColor: "orange" }} onClick={() => cercaMatch()}>
+            <div style={{ width: "100%", flexDirection: "row", gap: "1vw", justifyContent: "center" }}>
+              <button id="artistiSimili" style={{ backgroundColor: "orange" }} onClick={() => cercaSimili()}>
                 <ion-icon name="people-circle-outline"></ion-icon> <b>artisti <br /> simili</b>
               </button>
-              <button style={{ backgroundColor: "salmon" }} onClick={() => { setCategoria(""); setPrimoLivello(""); setSecondoLivello("") }}>
+              <button id="artistiComplementari" style={{ backgroundColor: "salmon" }} onClick={() => cercaComplementari()}>
                 <ion-icon name="people-circle"></ion-icon> <b>artisti <br /> complementari</b>
               </button>
             </div>
             : null}
         </div>
-        : null}
+        : secondoLivello && !loading ?
+          <div>
+            <p>Non hai ancora aggiornato nickname e città!</p>
+            <button style={{ backgroundColor: "grey" }}
+              onClick={() => { navigate("/dashboard") }}>
+              <ion-icon name="arrow-redo-circle-outline"></ion-icon> Vai alla Dashboard
+            </button>
+          </div>
+          :
+          null
+      }
       {secondoLivello ? null :
-        <div><h2>Imposta preferenze:</h2>
+        <div><h2>Imposta preferenze:</h2> <br />
           <div style={{ height: "auto", overflowY: "auto" }}>
             <div style={{ flexDirection: "row", width: "100%", flexWrap: "wrap", gap: "1vw", justifyContent: "center", marginBottom: "1vw" }}>
               {Object.keys(categorie).map((singolaCategoria) => (
-                <div>
+                <div key={singolaCategoria}>
                   {categoria == singolaCategoria ?
                     <button style={{ backgroundColor: "#7F0799", border: "3px solid black" }}>
                       {singolaCategoria}
@@ -142,7 +211,7 @@ function Home() {
             </div>
             {categoria ? <div style={{ flexDirection: "row", width: "100%", flexWrap: "wrap", gap: "1vw", justifyContent: "center", marginBottom: "1vw" }}>
               {categorie[categoria].livello1.map((sottocategoria) => (
-                <div>
+                <div key={sottocategoria}>
                   {primoLivello == sottocategoria ?
                     <button style={{ backgroundColor: "#9649CB", border: "3px solid black" }}>
                       {sottocategoria}
@@ -157,7 +226,7 @@ function Home() {
             </div> : null}
             {primoLivello ? <div style={{ flexDirection: "row", width: "100%", flexWrap: "wrap", gap: "1vw", justifyContent: "center", marginBottom: "1vw" }}>
               {categorie[categoria].livello2.map((sottocategoria) => (
-                <div>
+                <div key={sottocategoria}>
                   {secondoLivello == sottocategoria ?
                     <button style={{ backgroundColor: "#0C7489", border: "3px solid black" }}>
                       {sottocategoria}
@@ -176,39 +245,20 @@ function Home() {
           </div>
         </div>}
       <br />
-      {currentUser ?
+      {currentUser && artisti != [] ?
         <div style={{ flexDirection: "row", flexWrap: "wrap", gap: "2vw", width: "80%", justifyContent: "center" }}>
-          <div class="user-info-window">
-            <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
-            <h2>Nome Utente</h2>
-            <p>Descrizione dell'utente</p>
-            <button class="contact-button">Contattami</button>
-          </div>
-          <div class="user-info-window">
-            <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
-            <h2>Nome Utente</h2>
-            <p>Descrizione dell'utente</p>
-            <button class="contact-button">Contattami</button>
-          </div>
-          <div class="user-info-window">
-            <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
-            <h2>Nome Utente</h2>
-            <p>Descrizione dell'utente</p>
-            <button class="contact-button">Contattami</button>
-          </div>
-          <div class="user-info-window">
-            <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
-            <h2>Nome Utente</h2>
-            <p>Descrizione dell'utente</p>
-            <button class="contact-button">Contattami</button>
-          </div>
-          <div class="user-info-window">
-            <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
-            <h2>Nome Utente</h2>
-            <p>Descrizione dell'utente</p>
-            <button class="contact-button">Contattami</button>
-          </div>
-        </div> : null}
+          {artisti.map((artista) => {
+            return (
+              <div key={artista.id} className="user-info-window" style={{ width: "27vw", overflow: "hidden" }}>
+                <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
+                <h2>{artista.nickname}, {artista.city} </h2>
+                <p>{artista.categoria}, {artista.primoLivello}, {artista.secondoLivello}</p>
+                <button className="contact-button">Contattami</button>
+              </div>
+            )
+          })}
+        </div>
+        : null}
       <br /><br />
     </div>
   );

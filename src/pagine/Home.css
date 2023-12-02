@@ -10,6 +10,17 @@
     color: white;
   }
 
+  h2{
+    display: flex;
+    align-items: center;
+    margin: 0;
+  }
+
+  h3{
+    display: flex;
+    align-items: center;
+  }
+
   body {
     font-family: Arial, sans-serif;
     margin: 0;

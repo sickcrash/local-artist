@@ -15,7 +15,6 @@ function Home() {
       if (retrieved.data()) setDatiUtente(retrieved.data())
     }
     ottieniDati()
-    // il retrieve avviene con successo
   }, [])
 
   const handleLogout = async (e) => {
@@ -60,7 +59,7 @@ function Home() {
 
   return (
     <div className="main">
-      <div class="profile-picture">
+      <div className="profile-picture">
         <img src="https://picsum.photos/200" alt="Foto Profilo" />
       </div>
       <h2>Benvenuto, {currentUser ? currentUser.email : 'Ospite'}!</h2>
@@ -69,13 +68,13 @@ function Home() {
         <p>Nome d'arte</p>
         <input type="text" value={datiUtente.nickname ? datiUtente.nickname : ""} disabled />
         <input type="text" placeholder="Nuovo nome" id="nickname" />
-        <button style={{ backgroundColor: "gray" }} onClick={() => updateProfile("nickname")}>Aggiorna</button>
+        <button style={{ backgroundColor: "gray", padding: "0.5vw" }} onClick={() => updateProfile("nickname")}>Aggiorna</button>
       </section>
       <section>
         <p>Città</p>
         <input type="text" value={datiUtente.city ? datiUtente.city : ""} disabled />
         <input type="text" placeholder="Nuova città" id="city" />
-        <button style={{ backgroundColor: "gray" }} onClick={() => updateProfile("city")}>Aggiorna</button>
+        <button style={{ backgroundColor: "gray", padding: "0.5vw" }} onClick={() => updateProfile("city")}>Aggiorna</button>
       </section>
       <br />
       {currentUser && <button

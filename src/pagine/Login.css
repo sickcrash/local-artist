@@ -19,8 +19,17 @@ section{
   display: flex;
   justify-content: center;
   align-items: center;
+  align-content: center;
   flex-direction: row;
   gap: 1vw;
+}
+
+section >*{
+  margin: 0;
+}
+
+section >input{
+  margin-top: 0.8vw;
 }
 
 form {
