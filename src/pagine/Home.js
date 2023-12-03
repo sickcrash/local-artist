@@ -102,12 +102,14 @@ function Home() {
         const utenteSnap = await getDoc(utenteRef);
         if (utenteSnap.exists()) {
           const utenteData = utenteSnap.data();
-          return {
-            ...miodoc.data().preferenze,
-            id: utenteId,
-            nickname: utenteData.nickname,
-            city: utenteData.city
-          };
+          if (utenteData.city === datiUtente.city) {
+            return {
+              ...miodoc.data().preferenze,
+              id: utenteId,
+              nickname: utenteData.nickname,
+              city: utenteData.city
+            };
+          }
         }
         return null;
       });
@@ -126,8 +128,29 @@ function Home() {
       where("preferenze.categoria", "==", categoria),
       where("preferenze.secondoLivello", "==", secondoLivello)
     ))
-    const mappatura = retrieved.docs.filter(doc => doc.id !== currentUser.uid).map((doc) => ({ ...doc.data(), id: doc.id }))
-    setArtisti(mappatura)
+    const promises = retrieved.docs
+      .filter(miodoc => miodoc.id != currentUser.uid)
+      .map(async (miodoc) => {
+        const utenteId = miodoc.id;
+        const utenteRef = doc(db, "utenti", utenteId);
+        const utenteSnap = await getDoc(utenteRef);
+        if (utenteSnap.exists()) {
+          const utenteData = utenteSnap.data();
+          if (utenteData.city === datiUtente.city) {
+            return {
+              ...miodoc.data().preferenze,
+              id: utenteId,
+              nickname: utenteData.nickname,
+              city: utenteData.city
+            };
+          }
+        }
+        return null;
+      });
+    const results = await Promise.all(promises);
+    const filteredResults = results.filter(result => result !== null);
+    console.log(filteredResults)
+    setArtisti(filteredResults)
     document.getElementById("artistiComplementari").style.border = "3px solid black"
     document.getElementById("artistiSimili").style.border = ""
   }
@@ -251,7 +274,7 @@ function Home() {
             return (
               <div key={artista.id} className="user-info-window" style={{ width: "27vw", overflow: "hidden" }}>
                 <img src="https://picsum.photos/200/200" alt="Immagine Profilo" />
-                <h2>{artista.nickname}, {artista.city} </h2>
+                <h2>{artista.nickname}, {artista.city}</h2>
                 <p>{artista.categoria}, {artista.primoLivello}, {artista.secondoLivello}</p>
                 <button className="contact-button">Contattami</button>
               </div>
