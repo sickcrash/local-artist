@@ -39,7 +39,7 @@ function Signup() {
 
                     <button type="submit">Registrati</button>
                 </form>
-                <p>Hai già un account? <a href="/Login">Effettua il login</a></p>
+                <p>Hai già un account? <a href="#/Login">Effettua il login</a></p>
                 <p style={{ color: "red" }}>{error}</p>
             </div>
         </RedirectLoggedIn>

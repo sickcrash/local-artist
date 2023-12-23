@@ -34,7 +34,7 @@ function Login() {
                     <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                     <button type="submit">Entra</button>
                 </form>
-                <p>Non hai un account? <a href="/signup">Registrati</a></p>
+                <p>Non hai un account? <a href="#/signup">Registrati</a></p>
                 <p style={{color:"red"}}>{error}</p>
             </div>
         </RedirectLoggedIn>
